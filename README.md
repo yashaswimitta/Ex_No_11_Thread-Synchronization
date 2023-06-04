@@ -28,24 +28,183 @@ Step 7: Save and run the application.
  ```
 /*
 Program to create an Option Menu
-Developed by: 
-RegisterNumber:  
+Developed by: YASHASWI MITTA
+RegisterNumber:  212221230062
 */
 ```
 
 ## MainActivity.java:
+```
+package com.example.threadsyn;
 
+import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.Bundle;
+import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+import java.util.concurrent.Semaphore;
+public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
 
+    // Object used for synchronizing access to counter
+    private static final Object lock = new Object();
 
+    // Maximum number of concurrent threads
+    // that can access the counter
+    private static final int MAX_THREADS = 5;
 
+    // Semaphore to limit concurrent access to the counter
+    private static final Semaphore semaphore = new Semaphore(MAX_THREADS);
+
+    // Counter to store the
+    // number of button clicks
+    private int counter = 0;
+
+    // Reference to the text view to
+    // display the number of button clicks
+    private TextView textView;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        textView = findViewById(R.id.text_view);
+    }
+    public void incrementCounter(View view) {
+        // Start a new thread to increment the counter
+        new Thread(() -> {
+            try {
+                // Acquire the semaphore
+                semaphore.acquire();
+                // Synchronized block to update the counter
+                synchronized (lock) {
+                    counter++;
+                }
+            } catch (InterruptedException e) {
+                // Log an error if the thread is interrupted
+                Log.e(TAG, "Thread interrupted", e);
+            } finally {
+                // Release the semaphore
+                semaphore.release();
+            }
+            // Update the text view on the main thread
+            updateTextView();
+        }).start();
+    }
+
+    // Method to update the text view on the main thread
+    private void updateTextView() {
+        // Post the update to the main thread's message queue
+        new Handler(getMainLooper()).post(() -> textView.setText(String.valueOf(counter)));
+    }
+
+}
+```
 ## activity_main.xml:
+```
+package com.example.threadsyn;
 
+import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.Bundle;
+import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+import java.util.concurrent.Semaphore;
+public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
+
+    // Object used for synchronizing access to counter
+    private static final Object lock = new Object();
+
+    // Maximum number of concurrent threads
+    // that can access the counter
+    private static final int MAX_THREADS = 5;
+
+    // Semaphore to limit concurrent access to the counter
+    private static final Semaphore semaphore = new Semaphore(MAX_THREADS);
+
+    // Counter to store the
+    // number of button clicks
+    private int counter = 0;
+
+    // Reference to the text view to
+    // display the number of button clicks
+    private TextView textView;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        textView = findViewById(R.id.text_view);
+    }
+    public void incrementCounter(View view) {
+        // Start a new thread to increment the counter
+        new Thread(() -> {
+            try {
+                // Acquire the semaphore
+                semaphore.acquire();
+                // Synchronized block to update the counter
+                synchronized (lock) {
+                    counter++;
+                }
+            } catch (InterruptedException e) {
+                // Log an error if the thread is interrupted
+                Log.e(TAG, "Thread interrupted", e);
+            } finally {
+                // Release the semaphore
+                semaphore.release();
+            }
+            // Update the text view on the main thread
+            updateTextView();
+        }).start();
+    }
+
+    // Method to update the text view on the main thread
+    private void updateTextView() {
+        // Post the update to the main thread's message queue
+        new Handler(getMainLooper()).post(() -> textView.setText(String.valueOf(counter)));
+    }
+
+}
+```
 ## AndroidMainfest.xml
+```
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Threadsyn"
+        tools:targetApi="31">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
+```
 ## Output
 
+![AND 10 1](https://github.com/yashaswimitta/Ex_No_11_Thread-Synchronization/assets/94619247/7ee59e55-c2fb-4b8b-8e87-7fc52d3114d5)
+![AND 10 2](https://github.com/yashaswimitta/Ex_No_11_Thread-Synchronization/assets/94619247/f9a34494-59e1-43b7-9157-7d13d667e29e)
 
 
 ## Result:
